@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<title>Login Gpass</title>
+</head>
+<body>
+	<h1>Login</h1>
+	<h2>Email</h2>
+	<input id="emails" type="email" name="email">
+	<br>
+	<h2>Contraseña</h2>
+	<input id="passwords" type="password" name="password">
+	<br>
+	<button id="boton" onclick="log()">Enviar</button>
+
+</body>
+
+<script type="text/javascript">
+		
+		function log(){
+
+			$.ajax({
+			  	method: "POST",
+			  	url: "http://localhost:8888/Gpass/public/index.php/api/login",
+			  	data: {
+			  		email: document.getElementById("emails").value, 
+			  		password: document.getElementById("passwords").value
+				}
+			})
+			.done(function(msg){
+					alert("Ok");
+				})
+			.fail(function(msg){
+					alert("No Existe" + msg);
+				});
+		}
+</script>
+</html>

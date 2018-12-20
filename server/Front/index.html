@@ -1,0 +1,44 @@
+ <!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<title>Registro Gpass</title>
+	
+</head>
+<body>
+	<h1>Register</h1>
+	<h2>Name</h2>
+	<input id="users" type="text" name="name">
+	<br>
+	<h2>Email</h2>
+	<input id="emails" type="email" name="email">
+	<br>
+	<h2>Password</h2>
+	<input id="passwords" type="password" name="password">
+	<br>
+	<button id="boton" onclick="send()">Enviar</button>
+</body>
+
+	<script type="text/javascript">
+
+	function send()
+	{
+		
+  		$.ajax({
+			  method: "POST",
+			  url: "http://localhost:8888/Gpass/public/index.php/api/register",
+			  data: { user: document.getElementById("users").value, 
+			  		email: document.getElementById("emails").value, 
+			  		password: document.getElementById("passwords").value
+			}
+		})
+		.done(function(msg){
+				alert("Ok");
+			})
+		.fail(function(msg){
+				alert("Estas Fuerisima" + msg);
+			});
+	}
+  	</script>
+</html>
