@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+
+	<style>
+		*
+		{
+			
+		}
+		body
+		{
+			background-image: url("fondo.jpg");
+		}
+		#form
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+		}
+		h1
+		{
+			margin-top: 10%;
+			text-align: center;
+			color:white;
+		}
+		.respuesta
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+			color:white;
+		}
+		.error
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+			color:white;
+		}
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+	<h1>Login</h1>
+
+	<div id="form">
+		<h3>Email:</h3>
+		<input id="email" type="email" placeholder="Carlos@gmail.com">
+		<br>
+		<h3>Password:</h3>
+		<input id="password" type="password" placeholder="123456789">
+		<br><br>
+		<input type="button" onclick="Login()" value="Login">
+		<br><br>
+	</div>
+
+</body>
+
+<script type="text/javascript">
+	
+	function Login(){
+
+		var email = document.getElementById("email").value;
+		var password = document.getElementById("password").value;
+		$(".error").remove();
+
+		$.ajax({
+		 	 method: "POST",
+		 	 url: "http://localhost:8888/Gpass/public/index.php/api/login",
+		 	 data: { 
+		 	 	email: email,
+		 	   	password: password 
+		 	 },
+		 	 success: function(response){
+
+		 	 	var response = jQuery.parseJSON(response);
+		 	 	localStorage.setItem("token",response.data);
+
+		 	 	var message = "Usuario Logueado";
+		 	 	window.location = "http://localhost:8888/Front/Categories.html";                   
+
+		 	 },
+		
+		 	 error: function(response){
+		 	 	var response = jQuery.parseJSON(response.responseText);
+		 	 	$('<div class="error"/>').html(response.message).appendTo('body');
+		 	 }
+		});
+	}
+</script>
+</html>
