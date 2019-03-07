@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Contraseñas</title>
+
+	<style>
+		*
+		{
+			
+		}
+		body
+		{
+			background-image: url("fondo.jpg");
+		}
+		#form
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+		}
+		#Estructura
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 10px;
+			margin-left: 35%;
+   			margin-right: 35%;	
+   			margin-top: inherit;	
+		}
+		h1
+		{
+			margin-top: 10%;
+			text-align: center;
+			color:white;
+		}
+		.respuesta
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+			color:white;
+		}
+		.tabla
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			margin-left: auto;
+   			margin-right: auto;
+			padding: 10px;
+			color:white;
+		}
+		.btn
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+		}	
+		.error
+		{
+			text-align: center;
+			background-color: rgba(204, 127, 126, 0.5);
+
+			padding: 5px;
+			margin-left: auto;
+   			margin-right: auto;
+			width: 200px;
+			color:white;
+		}
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+	<h1>Passwords</h1>
+
+	<div id="form">
+		<h3>Name Of Password</h3>
+
+		<input id="passwordName" type="name" placeholder="passwordName">
+		<br><br>
+		<input id="password" type="name" placeholder="password">
+		<br><br>
+		<select id='categories'>
+			 
+		</select>
+		<br><br>
+		<input class="btn" type="button" onclick="CreatePassword()" value="Crear Categoria">
+		<br><br>
+
+	</div>
+
+	<div id="Estructura">
+	<input class="btn" type="button" onclick="Allpasswords()" value="Show All Passwords">
+	</div>
+
+	<div id="Estructura">
+	<input class="btn" type="button" onclick="CerrarSesion()" value="Cerrar Sesion">
+	</div>
+</body>
+
+<script type="text/javascript">
+
+	if(!localStorage.getItem("token"))
+	{
+		window.location = "http://localhost:8888/Front/Login.html";
+	}else
+	{
+		Allcategories();
+		var categoriesSave;
+	}
+
+
+	
+	function CreatePassword(){
+
+		var Authorization = localStorage.getItem("token"); 
+		var passwordName = document.getElementById("passwordName").value;
+		var password = document.getElementById("password").value;
+
+		$(".error").remove();
+
+		$.ajax({
+		 	 method: "POST",
+		 	 url: "http://localhost:8888/Gpass/public/index.php/api/password",
+		 	 headers:
+		 	 {
+		 		"Authorization" : Authorization 
+		 	 },
+		 	 data: { 
+
+		 	 	"passwordName":passwordName,
+		 	 	"password":password,
+		 	 	"category_id":$("#categories").val()
+
+		 	 },
+		 	 success: function(response){
+		 	 	var response = jQuery.parseJSON(response);
+		 		$('<div class="error"/>').html(response.message).appendTo('#form');
+		 	 },
+		
+		 	 error: function(response){
+		 	 	var response = jQuery.parseJSON(response.responseText);
+		 	 	$('<div class="error"/>').html(response.message).appendTo('#form');
+		 	 }
+		});
+	}
+
+	function Allpasswords(){
+
+		var Authorization = localStorage.getItem("token"); 
+		$(".error").remove();
+		$("#tabla").remove();
+
+
+		$.ajax({
+		 	method: "GET",
+		 	url: "http://localhost:8888/Gpass/public/index.php/api/password",
+		 	headers:
+		 	{
+		 		"Authorization" : Authorization 
+		 	},
+		 	success: function(response){
+
+		 		var response = jQuery.parseJSON(response);
+
+				if(document.getElementById("tabla") == null)
+				{
+					$('<table id="tabla"/>').html("").appendTo('#Estructura');
+					$('<th id="filaNombre" class="respuesta"/>').html("Nombre de la Passwords").appendTo('#tabla');
+					$('<th id="filaEmail" class="respuesta"/>').html("Passwords").appendTo('#tabla');
+					$('<th id="filaEditar" class="respuesta"/>').html("Editar").appendTo('#tabla');
+					$('<th id="filaBorrar" class="respuesta"/>').html("Borrar").appendTo('#tabla');
+				}
+				
+				for (i = 0; i < response.data.length; i++) {
+
+					//Columna Nombre
+				  	$('<div/><br>').html(response.data[i].title).appendTo('#filaNombre');
+
+				  	//Columna Email
+				  	$('<div/><br>').html(response.data[i].password).appendTo('#filaEmail');
+
+
+				  	//Fila editar
+				  	$('<br>').html("").appendTo('#filaEditar');
+
+				  	$('<input id="name" type="text"  class="editName" placeholder="Nuevo Nombre">').html("").appendTo('#filaEditar').attr("id", response.data[i].id + "passwordName");
+
+				  	$('<input id="password" type="password"  class="editPasword" placeholder="Nuevo password">').html("").appendTo('#filaEditar').attr("id", response.data[i].id + "password");
+
+				  	$('<select id="category">').html("").appendTo('#filaEditar').attr("id", response.data[i].id + "select");
+
+				  	$('<input type="button" class="btn" onclick="EditUser(this)" value="Editar">').html("").appendTo('#filaEditar').attr("id", response.data[i].id);
+
+				  	$('<br>').html("").appendTo('#filaEditar');
+
+				  	//Fila Borrar
+				  	$('<br><input type="button" onclick="Delete(this)" class="btn" value="Borrar"><br>').html("").appendTo('#filaBorrar').attr("id", response.data[i].id);
+				};
+
+
+				console.log(response.data.length);
+				console.log(categoriesSave.length);
+
+				for (i = 0; i < response.data.length; i++) {
+
+					var select = $("#" + response.data[i].id  + "select");
+
+					if(select.prop) {
+						  var options = select.prop('options');
+						}
+						else {
+						  var options = select.attr('options');
+						}
+					options[0] = new Option ("Ninguna", "");
+
+					for (j = 0; j < categoriesSave.length; j++) {
+
+						
+
+						options[j + 1] = new Option(categoriesSave[j].name , categoriesSave[j].id);
+					};
+				};
+
+		 	},
+		
+		 	error: function(response){
+		 		var response = jQuery.parseJSON(response.responseText);
+		 		$('<div class="error"/>').html(response.message).appendTo('body');
+		 	}
+		});
+	}
+
+	function Allcategories(){
+
+		var Authorization = localStorage.getItem("token"); 
+		$(".error").remove();
+		$("#tabla").remove();
+
+
+		$.ajax({
+		 	method: "GET",
+		 	url: "http://localhost:8888/Gpass/public/index.php/api/category",
+		 	headers:
+		 	{
+		 		"Authorization" : Authorization 
+		 	},
+		 	success: function(response){
+
+		 		var response = jQuery.parseJSON(response);
+				var select = document.getElementById("categories");
+
+				select.options.length = 0;
+				select.options[0] = new Option ("Ninguna", "");
+				select.options[0].selected="true";
+
+				categoriesSave = response.data;
+
+		 		for (i = 0; i < response.data.length; i++) {
+
+					select.append(new Option(response.data[i].name, response.data[i].id)); 	
+				};	
+		 	},
+		
+		 	error: function(response){
+		 		var response = jQuery.parseJSON(response.responseText);
+		 		$('<div class="error"/>').html(response.message).appendTo('body');
+		 	}
+		});
+	}
+
+	function EditCategories(button){
+
+		var Authorization = localStorage.getItem("token"); 
+		var text = document.getElementById(button.id);
+		$(".error").remove();
+
+		console.log(text);
+
+    	$.ajax({
+
+		 	method: "POST",
+		 	url: "http://localhost:8888/Gpass/public/index.php/api/category/" + button.id,
+		 	headers:
+		 	{
+		 		"Authorization" : Authorization 
+		 	},
+		 	data: { 
+		 		newCategoryName: text.value,
+		 		"_method" : "PUT" 
+		 	},
+		 	success: function(response){
+		 		var response = jQuery.parseJSON(response);
+		 		$('<div class="error"/>').html(response.message).appendTo('#Estructura');
+		 		Allcategories();
+		 	},
+		
+		 	error: function(response){
+		 	 	var response = jQuery.parseJSON(response.responseText);
+		 	 	$('<div class="error"/>').html(response.message).appendTo('#Estructura');
+		 	}
+		});
+	}
+
+	function Delete(button) {
+
+		var Authorization = localStorage.getItem("token");
+		$(".error").remove(); 
+
+		$.ajax({
+
+		 	method: "DELETE",
+		 	url: "http://localhost:8888/Gpass/public/index.php/api/category/" + button.id,
+		 	headers:
+		 	{
+		 		"Authorization" : Authorization 
+		 	},
+		 	success: function(response){
+		 		var response = jQuery.parseJSON(response);
+		 		$('<div class="error"/>').html(response.message).appendTo('#Estructura');
+		 		Allcategories();
+		 	},
+		
+		 	error: function(response){
+		 	 	var response = jQuery.parseJSON(response.responseText);
+		 	 	$('<div class="error"/>').html(response.message).appendTo('#Estructura');
+		 	 	Allcategories();
+		 	}
+		});		
+	}
+
+	function CerrarSesion()
+	{
+		console.log("CerrarSesion");
+		localStorage.clear();
+		window.location = "http://localhost:8888/Front/Login.html";  
+	}
+</script>
+</html>
